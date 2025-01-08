@@ -18,8 +18,9 @@ table.insert(launch_menu, {
   args = { 'pwsh.exe', '-NoLogo' },
 })
 
-config.color_scheme = 'AdventureTime'
-config.default_prog = { 'powershell.exe', '-NoLogo' }
+config.color_scheme = 'catppuccin-mocha'
+--config.color_scheme = 'rose-pine-dawn'
+config.default_prog = { 'pwsh.exe', '-NoLogo' }
 config.launch_menu = launch_menu
 
 
