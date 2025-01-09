@@ -6,6 +6,7 @@
 
 !.wezterm.lua
 
-!nvim/
+!AppData/Local/nvim/**
 
+!nvim/*
 
