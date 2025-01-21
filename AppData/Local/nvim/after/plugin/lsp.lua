@@ -2,37 +2,53 @@ local lsp = require("lsp-zero")
 
 lsp.preset("recommended")
 
-lsp.ensure_installed({
---  'rust_analyzer',
--- 'clangd',
---  'bashls',
-  'lua_ls',
-  'typst_lsp',
-  'yamlls',
-  'jsonls',
-  'gopls',
-  'templ',
-  'pyright',
-  'eslint',
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  ensure_installed = {'lua_ls', 'basedpyright', 'jsonls'},
+})
+require('mason-lspconfig').setup({
+  handlers = {
+    -- this first function is the "default handler"
+    -- it applies to every language server without a "custom handler"
+    function(server_name)
+      require('lspconfig')[server_name].setup({})
+    end,
+  },
 })
 
 lsp.nvim_workspace()
 
 local cmp = require('cmp')
+local cmp_action = require('lsp-zero').cmp_action()
 local cmp_select = {behavior = cmp.SelectBehavior.Select}
-local cmp_mappings = lsp.defaults.cmp_mappings({
-  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-  ["<C-Space>"] = cmp.mapping.complete(),
+
+cmp.setup({
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+    ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+    ['<Tab>'] = nil,
+    ['<S-Tab>'] = nil
+  }),
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end,
+  },
+  sources = {
+      {name = 'nvim_lsp'},
+  }
 })
 
-cmp_mappings['<Tab>'] = nil
-cmp_mappings['<S-Tab>'] = nil
-
-lsp.setup_nvim_cmp({
-  mapping = cmp_mappings
-})
 
 lsp.set_preferences({
     suggest_lsp_servers = false,
